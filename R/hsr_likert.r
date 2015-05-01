@@ -26,21 +26,21 @@
 
 plot_likert <- function(.data,
                         topic="Instructional Leadership", ...){
-  data<-.data %>%
+  data <- .data %>%
     dplyr::filter(topic_name %in% topic) %>%
     pre_process_likert(...)
 
-  hsr.sum.pos.neg<-data %>%
+  hsr_sum_pos_neg <- data %>%
     dplyr::group_by(topic_name, SQ, School, Sign) %>%
     dplyr::summarize(Sum=sum(measure_values)) %>%
-    dplyr::mutate(x=ifelse(Sign=="Strongly Agree", 1.05, NA),
-                  x=ifelse(Sign=="Strongly Disagree", -0.85, x),
-                  x=ifelse(Sign=="Neutral", 0, x)
+    dplyr::mutate(x=ifelse(Sign == "Strongly Agree", 1.05, NA),
+                  x=ifelse(Sign == "Strongly Disagree", -0.85, x),
+                  x=ifelse(Sign == "Neutral", 0, x)
     )
 
-  data.labels<-hsr.sum.pos.neg
+  data_labels <- hsr_sum_pos_neg
 
-  p<-ggplot(data %>%
+  p <- ggplot(data %>%
                        dplyr::arrange(Measure.Names),
                      aes(y=School, x=x)) +
     geom_segment(aes(xend=xend,
@@ -49,20 +49,20 @@ plot_likert <- function(.data,
                      alpha=School),
                      size=2.5) +
     #geom_vline(aes(xintercept=0), type=3, color="lightgray") +
-    geom_text(data=data.labels %>%
-                         dplyr::filter(Sign!="Neutral"),
+    geom_text(data=data_labels %>%
+                         dplyr::filter(Sign != "Neutral"),
                        aes(x=x,
                   y=School,
-                  label=round(100*Sum),
+                  label=round(100 * Sum),
                   color=Sign,
                   alpha=School),
               size=1.75
     ) +
-    geom_text(data=data.labels %>%
-                         dplyr::filter(Sign=="Neutral" & Sum!=0),
+    geom_text(data=data_labels %>%
+                         dplyr::filter(Sign == "Neutral" & Sum != 0),
                        aes(x=x,
                                     y=School,
-                                    label=round(100*Sum),
+                                    label=round(100 * Sum),
                                     alpha=School),
                       color="black",
                       size=1.75
@@ -100,87 +100,101 @@ plot_likert <- function(.data,
 #'
 
 pre_process_likert <- function(.data,
-                             school_order=c("KAP", "KAMS", "KCCP", "KBCP", "KC", "KN"),
+                             school_order=c("KAP",
+                                            "KAMS",
+                                            "KCCP",
+                                            "KBCP",
+                                            "KC",
+                                            "KN"),
                                ...) {
   #subset lickert measures
-  lick.levels<-c("Strongly Disagree",
-                 "Disagree",
-                 "Neutral",
-                 "Agree",
-                 "Strongly Agree")
+  lick_levels <- c("Strongly Disagree",
+                   "Disagree",
+                   "Neutral",
+                   "Agree",
+                   "Strongly Agree")
 
-  hsr.lickert<-.data %>%
-    dplyr::filter(measure_names %in% lick.levels) %>%
-    dplyr::mutate(Measure.Names=factor(measure_names, levels=lick.levels, ordered=TRUE))
+  hsr_lickert <- .data %>%
+    dplyr::filter(measure_names %in% lick_levels) %>%
+    dplyr::mutate(Measure.Names=factor(measure_names,
+                                       levels=lick_levels,
+                                       ordered=TRUE))
 
   #identify center level
-  lick.names.len<-length(levels(hsr.lickert$Measure.Names))
-  center<-(lick.names.len-1)/2 + 1
-  center.name<-levels(hsr.lickert$Measure.Names)[center]
-  neg.names <- levels(hsr.lickert$Measure.Names)[1:(center-1)]
-  pos.names <- levels(hsr.lickert$Measure.Names)[(center+1):lick.names.len]
+  lick_names_len <- length(levels(hsr_lickert$Measure.Names))
+  center <- (lick_names_len - 1) / 2 + 1
+  center_name <- levels(hsr_lickert$Measure.Names)[center]
+  neg_names <- levels(hsr_lickert$Measure.Names)[1: (center - 1)]
+  pos_names <- levels(hsr_lickert$Measure.Names)[ (center + 1):lick_names_len]
 
 
-  neu<-hsr.lickert %>%
-    dplyr::filter(Measure.Names %in% center.name)
+  neu <- hsr_lickert %>%
+    dplyr::filter(Measure.Names %in% center_name)
 
-  pos<-hsr.lickert %>%
-    dplyr::filter(Measure.Names %in% pos.names) %>%
+  pos <- hsr_lickert %>%
+    dplyr::filter(Measure.Names %in% pos_names) %>%
     dplyr::arrange(Measure.Names) %>%
     dplyr::group_by(school, survey_question) %>%
-    dplyr::mutate(x=cumsum(measure_values)-measure_values,
-                  xend=x+measure_values
+    dplyr::mutate(x=cumsum(measure_values) - measure_values,
+                  xend=x + measure_values
                   )
 
-  neg<-hsr.lickert %>%
-    dplyr::filter(Measure.Names %in% neg.names) %>%
+  neg <- hsr_lickert %>%
+    dplyr::filter(Measure.Names %in% neg_names) %>%
     dplyr::arrange(desc(Measure.Names)) %>%
     dplyr::group_by(school, survey_question) %>%
-    dplyr::mutate(x=cumsum(measure_values)-measure_values,
-                  xend=x+measure_values,
+    dplyr::mutate(x=cumsum(measure_values) - measure_values,
+                  xend=x + measure_values,
                   x=-x,
                   xend=-xend
                   )
 
-  neu<-neu %>%
-    dplyr::mutate(x=-measure_values/2,
+  neu <- neu %>%
+    dplyr::mutate(x=-measure_values / 2,
                   xend=-x) %>%
     dplyr::ungroup()
 
 
-  nn<-dplyr::left_join(neg,
+  nn <- dplyr::left_join(neg,
                        neu %>%
                          dplyr::select(school, survey_question, adj=x),
                        by = c("school", "survey_question")) %>%
-    dplyr::mutate(x=x+adj,
-                  xend=xend+adj,
+    dplyr::mutate(x=x + adj,
+                  xend=xend + adj,
                   adj=NULL)
 
-  neg<-nn
+  neg <- nn
 
-  pn<-dplyr::left_join(pos,
-                       neu %>%
-                         dplyr::select(school, survey_question, adj=xend),
-                       by = c("school", "survey_question")) %>%
-    dplyr::mutate(x=x+adj,
-                  xend=xend+adj,
+  pn <- dplyr::left_join(pos,
+                         neu %>%
+                           dplyr::select(school, survey_question, adj=xend),
+                         by = c("school", "survey_question")) %>%
+    dplyr::mutate(x=x + adj,
+                  xend=xend + adj,
                   adj=NULL
                   )
 
-  pos<-pn
+  pos <- pn
 
-  hsr.plot.data<-rbind(pos, neg, neu) %>%
+  hsr_plot_data <- rbind(pos, neg, neu) %>%
     dplyr::mutate(Measure.Names=factor(as.character(Measure.Names),
-                                       levels=lick.levels, ordered=TRUE),
+                                       levels=lick_levels, ordered=TRUE),
                   School=abbrev(school, ...),
                   School=factor(School, levels=rev(school_order)),
-                  Sign=ifelse(grepl("Agree", Measure.Names),"Strongly Agree", NA),
-                  Sign=ifelse(grepl("Disagree", Measure.Names), "Strongly Disagree", Sign),
-                  Sign=ifelse(grepl("Neutral", Measure.Names),"Neutral", Sign),
-                  SQ=stringr::str_wrap(survey_question, width=90)
+                  Sign=ifelse(grepl("Agree", Measure.Names),
+                              "Strongly Agree",
+                              NA),
+                  Sign=ifelse(grepl("Disagree", Measure.Names),
+                              "Strongly Disagree",
+                              Sign),
+                  Sign=ifelse(grepl("Neutral", Measure.Names),
+                              "Neutral",
+                              Sign),
+                  SQ=stringr::str_wrap(survey_question,
+                                       width=90)
     )
 
-  hsr.plot.data
+  hsr_plot_data
 }
 
 
@@ -190,15 +204,16 @@ pre_process_likert <- function(.data,
 #'
 #'
 #' @param x character vector of school names to abbreviatioe
-#' @param list of two vectors of exceptions (character vector labeled \code{old}) and their
+#' @param exceptions list of two vectors of exceptions (character vector labeled \code{old}) and their
 #' new abbreviations (character vector labeled \code{new})
 
-abbrev <- function (x, exceptions = list(old=c("KAPS", "KCMS"), new=c("KAP", "KCCP")))
-{
+abbrev <- function (x,
+                    exceptions = list(old=c("KAPS", "KCMS"),
+                                      new=c("KAP", "KCCP"))) {
   x.out <- gsub(pattern = "(\\w)\\w*\\W*", replacement = "\\1",
                 x = x)
   if (!is.null(exceptions)) {
-    x.changed <- with(exceptions, new[match(x.out, old)])
+    x.changed <- exceptions$new[match(x.out, exceptions$old)]
     x.changed[is.na(x.changed)] <- x.out[is.na(x.changed)]
     x.out <- x.changed
   }
