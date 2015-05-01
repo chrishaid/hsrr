@@ -4,4 +4,4 @@
 
 [![codecov.io](http://codecov.io/github/chrishaid/hsrr/coverage.svg?branch=master)](http://codecov.io/github/chrishaid/hsrr?branch=master)
 
-Visualizations for KIPP Foundations HSR Survey Data
+Visualizations for KIPP Foundation's Healthy Schools and Regions Survey Data
