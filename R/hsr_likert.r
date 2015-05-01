@@ -145,7 +145,7 @@ pre_process_likert <- function(.data,
   neu<-neu %>%
     dplyr::mutate(x=-measure_values/2,
                   xend=-x) %>%
-    ungroup()
+    dplyr::ungroup()
 
 
   nn<-dplyr::left_join(neg,
