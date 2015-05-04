@@ -19,4 +19,16 @@ for survey data that is on lickert scale. Currently this function supports a a f
 point Likert scale the with levels "Strongly Disagree", "Disagree", "Neutral",
 "Agree", and "Strongly Agree"
 }
+\examples{
+data(ex_hsr)
+
+plot_likert(ex_hsr,
+            topic="Instructional Leadership",
+            school_order=c("KHS1",
+                            KMS1",
+                            "KMS2",
+                            "KHS2",
+                            "KR",
+                            "KN"))
+}
 

@@ -2,4 +2,4 @@
 
 export(plot_likert)
 export(pre_process_likert)
-importFrom(dplyr,"%>%")
+importFrom(magrittr,"%>%")

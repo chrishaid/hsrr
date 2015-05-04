@@ -10,7 +10,8 @@
 #' @param topic character vector of parent topics to filter form `.data`
 #' @param ... arguments passed to \code{\link{pre_process_likert}}
 #'
-#' @example
+#' @examples
+#'
 #' data(ex_hsr)
 #'
 #' plot_likert(ex_hsr,

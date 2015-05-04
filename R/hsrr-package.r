@@ -2,5 +2,5 @@
 #'
 #' @name hsrr
 #' @docType package
-#' @importFrom dplyr "%>%"
+#' @importFrom magrittr "%>%"
 NULL

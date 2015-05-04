@@ -9,7 +9,7 @@ abbrev(x, exceptions = list(old = c("KAPS", "KCMS"), new = c("KAP", "KCCP")))
 \arguments{
 \item{x}{character vector of school names to abbreviatioe}
 
-\item{list}{of two vectors of exceptions (character vector labeled \code{old}) and their
+\item{exceptions}{list of two vectors of exceptions (character vector labeled \code{old}) and their
 new abbreviations (character vector labeled \code{new})}
 }
 \description{
