@@ -16,11 +16,11 @@
 #' plot_likert(ex_hsr,
 #'             topic="Instructional Leadership",
 #'             school_order=c("KHS1",
-#'                             KMS1",
-#'                             "KMS2",
-#'                             "KHS2",
-#'                             "KR",
-#'                             "KN"))
+#'                            "KMS1",
+#'                            "KMS2",
+#'                            "KHS2",
+#'                            "KR",
+#'                            "KN"))
 #'
 #' @export
 
