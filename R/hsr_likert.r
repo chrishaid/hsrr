@@ -11,7 +11,6 @@
 #' @param ... arguments passed to \code{\link{pre_process_likert}}
 #'
 #' @examples
-#'
 #' data(ex_hsr)
 #'
 #' plot_likert(ex_hsr,
